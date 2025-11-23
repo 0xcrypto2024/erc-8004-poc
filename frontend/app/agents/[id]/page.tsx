@@ -26,8 +26,9 @@ const AGENT_DETAIL_QUERY = `
   }
 `;
 
-export default async function AgentDetail({ params }: { params: { id: string } }) {
-    const { data } = await client.query(AGENT_DETAIL_QUERY, { id: params.id }).toPromise();
+export default async function AgentDetail({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const { data } = await client.query(AGENT_DETAIL_QUERY, { id }).toPromise();
     const agent = data?.agent;
 
     if (!agent) {
