@@ -2,6 +2,8 @@ import hre from "hardhat";
 import fs from "fs";
 import path from "path";
 
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 async function main() {
     const [deployer] = await hre.ethers.getSigners();
     console.log("Deploying contracts with the account:", deployer.address);
@@ -49,6 +51,7 @@ async function main() {
         serviceRegistry: serviceRegistryAddress,
         juryRegistry: juryRegistryAddress,
     };
+
     const outputPath = path.resolve(__dirname, "deployment.json");
     fs.writeFileSync(outputPath, JSON.stringify(deploymentInfo, null, 2));
     console.log("Deployment addresses written to", outputPath);
