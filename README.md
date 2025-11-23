@@ -18,12 +18,14 @@ This project is a Proof of Concept (POC) for **ERC-8004**, a standard for regist
 *   **npm**: Installed with Node.js.
 *   **Git**: For cloning the repository.
 
-## 🚀 Comprehensive Guide
+## 🚀 Quick Start Guide
 
-Follow these steps to run the entire system, including the blockchain, indexer, and frontend.
+Follow these steps in order to run the entire system.
 
-### 1. Setup Environment
-Install dependencies for all components.
+### Step 1: Install Dependencies
+
+Install dependencies for all components:
+
 ```bash
 # Root dependencies (Hardhat)
 npm install
@@ -35,45 +37,103 @@ cd ponder && npm install && cd ..
 cd frontend && npm install && cd ..
 ```
 
-### 2. Start Local Blockchain
-Open **Terminal 1**. Start the Hardhat node to mimic Ethereum locally.
+### Step 2: Start Local Blockchain
+
+Open **Terminal 1** and start the Hardhat node:
+
 ```bash
 npx hardhat node
 ```
-*Keep this terminal running.*
 
-### 3. Start the Indexer
-Open **Terminal 2**. Start Ponder to index events from the local blockchain.
+**⚠️ Important:** Keep this terminal running. The local blockchain will be at `http://127.0.0.1:8545`.
+
+### Step 3: Deploy Contracts
+
+Open **Terminal 2** and deploy the smart contracts:
+
+```bash
+npx hardhat run scripts/demo.js --network localhost
+```
+
+**📝 Note the deployed addresses** from the output. You'll see something like:
+
+```
+AgentIdentityRegistry deployed to: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+AgentReputationRegistry deployed to: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+AgentValidationRegistry deployed to: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+AgentServiceRegistry deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
+AgentJuryRegistry deployed to: 0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9
+```
+
+This script also registers a demo agent, service, and validation for testing.
+
+### Step 4: Update Ponder Configuration
+
+**🔧 Update contract addresses** in `ponder/ponder.config.ts` with the addresses from Step 3.
+
+Open `ponder/ponder.config.ts` and update the `address` fields:
+
+```typescript
+contracts: {
+    AgentIdentityRegistry: {
+        abi: AgentIdentityRegistry.abi,
+        address: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // ← Update this
+        network: "hardhat",
+        startBlock: 0,
+    },
+    AgentReputationRegistry: {
+        abi: AgentReputationRegistry.abi,
+        address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", // ← Update this
+        // ... etc
+    },
+    // Update all 5 contract addresses
+}
+```
+
+> **💡 Tip:** Contract addresses change every time you restart the Hardhat node. Always update `ponder.config.ts` after deploying.
+
+### Step 5: Start the Indexer
+
+In **Terminal 2** (or a new terminal), start Ponder:
+
 ```bash
 cd ponder
+rm -rf .ponder  # Clear cache if restarting
 npm run dev
 ```
-*Keep this terminal running.*
 
-### 4. Start the Frontend Explorer
-Open **Terminal 3**. Start the Next.js frontend to view agents.
+**⚠️ Keep this running.** You should see:
+
+```
+✓ GraphQL Server live at http://localhost:42069
+✓ Indexing complete (1 agent, 1 service, 2 validations, 1 reputation)
+```
+
+### Step 6: Start the Frontend
+
+Open **Terminal 3** and start the Next.js frontend:
+
 ```bash
 cd frontend
 npm run dev
 ```
-*Keep this terminal running.* Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+**⚠️ Keep this running.** Open [http://localhost:3000](http://localhost:3000) in your browser to see the Agent Explorer.
 
 ---
 
-### 🧪 Use Case 1: Basic Agent Workflow
-Simulate an agent registering, performing a task, and getting validated.
+## 🧪 Testing Use Cases
 
-Open **Terminal 4** and run:
-```bash
-npx hardhat run scripts/demo.js --network localhost
-```
-**What happens:**
-1.  Contracts are deployed.
-2.  Agent registers (ID: 1).
-3.  Agent registers a service.
-4.  Agent submits a task.
-5.  Validator verifies the task (Optimistic Validation).
-6.  **Check the Frontend**: Refresh [localhost:3000](http://localhost:3000) to see the new agent and task.
+### Use Case 1: Basic Agent Workflow ✅
+
+The `demo.js` script (run in Step 3) already demonstrated:
+- ✅ Agent registration
+- ✅ Service registration  
+- ✅ Task submission with fee
+- ✅ Task validation by validator
+- ✅ Reputation score added
+
+**Verify**: Visit [localhost:3000](http://localhost:3000) to see Agent #1 with 1 service and validation history.
 
 ### ⚖️ Use Case 2: Dispute Resolution (Jury)
 Simulate a malicious agent submitting an invalid task, which is challenged and slashed by a jury.
