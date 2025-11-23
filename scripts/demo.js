@@ -33,6 +33,18 @@ async function main() {
     const serviceRegistryAddress = await serviceRegistry.getAddress();
     console.log("AgentServiceRegistry deployed to:", serviceRegistryAddress);
 
+    // Deploy Jury Registry
+    const JuryRegistry = await hre.ethers.getContractFactory("AgentJuryRegistry");
+    const juryRegistry = await JuryRegistry.deploy();
+    await juryRegistry.waitForDeployment();
+    const juryRegistryAddress = await juryRegistry.getAddress();
+    console.log("AgentJuryRegistry deployed to:", juryRegistryAddress);
+
+    // Wire up Validation Registry to use Jury Registry
+    await validationRegistry.setJuryRegistry(juryRegistryAddress);
+    console.log("Validation Registry wired to Jury Registry");
+
+
     // Register an Agent
     console.log("\nRegistering an Agent...");
     const agentUri = "https://example.com/agent-metadata.json";
