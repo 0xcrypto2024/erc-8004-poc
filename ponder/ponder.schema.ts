@@ -13,7 +13,7 @@ export const AgentRelations = relations(Agent, ({ many }) => ({
 
 export const Service = onchainTable("Service", (p) => ({
     id: p.text().primaryKey(), // Service ID (string)
-    agentId: p.bigint().references(() => Agent.id),
+    agentId: p.bigint(), // Removed .references()
     metadataURI: p.text(),
     active: p.boolean(),
 }));
@@ -28,7 +28,7 @@ export const ServiceRelations = relations(Service, ({ one }) => ({
 export const Validation = onchainTable("Validation", (p) => ({
     id: p.text().primaryKey(),
     taskId: p.bigint(),
-    agentId: p.bigint().references(() => Agent.id),
+    agentId: p.bigint(), // Removed .references()
     isValidated: p.boolean(),
     isValid: p.boolean(),
     validator: p.hex(),
